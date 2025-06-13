@@ -3,3 +3,4 @@
 *.pyc
 dataset/
 *.sqlite3
+chroma_db/
