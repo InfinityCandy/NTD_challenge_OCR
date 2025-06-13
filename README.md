@@ -90,8 +90,16 @@ $ python manage.py process_dataset "/absolute/path/to/dataset"
 
 ### 1. High-Level Diagram
 
-<Insert architecture diagram here>
-USE mermaid for the diagrma
+```mermaid
+graph TD
+    A[Client] --> B{Django Application};
+    B --> C[Django View/Endpoint];
+    C --> D[OCR Service];
+    D --> E[LLM Service];
+    E --> F[ChromaDB];
+    E --> G[Django View/Endpoint];
+    G --> A;
+```
 
 ### 2. System Components
 
@@ -146,3 +154,7 @@ Local instance of ChromaDB.
 - OCR Technology (Tesseract): This OCR techonology was selected over others because of the following:
   - Low cost.
   - Ease of configuration.
+
+```
+
+```

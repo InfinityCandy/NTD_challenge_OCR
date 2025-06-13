@@ -1,0 +1,8 @@
+graph TD
+    A[Client] --> B{Django Application};
+    B --> C[Django View/Endpoint];
+    C --> D[OCR Service];
+    D --> E[LLM Service];
+    E --> F[ChromaDB]
+    E --> G[Django View/Endpoint];
+    G --> A;
