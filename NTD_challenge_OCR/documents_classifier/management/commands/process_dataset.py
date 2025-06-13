@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from pathlib import Path
+from documents_classifier.document_processor.processor_pipeline import processor_pipeline
 
 
 class Command(BaseCommand):
@@ -21,8 +22,7 @@ class Command(BaseCommand):
                 if folder.is_dir():
                     for file in folder.iterdir():
                         if file.is_file():
-                            # TODO: Add processing pipeline here
-                            print(f"  File: {file.name}")
+                            processor_pipeline(file)
         else:
             self.stdout.write(
                 self.style.ERROR(
