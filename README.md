@@ -28,11 +28,11 @@ or if you are using windows check the official documentation on: https://tessera
 $ pip install -r requirements.txt
 ```
 
-5. Install transformers for PyTorch
+<!-- 5. Install transformers for PyTorch
 
 ```
 $ pip install "transformers[torch]"
-```
+``` -->
 
 5. Navigate to Django project folder and run migrations
 
@@ -41,25 +41,25 @@ $ cd NTD_challenge_OCR
 $ python manage.py migrate
 ```
 
-6. Fine-Tune model
+6. Authenticate in HuggingFace
+
+For this step you need to head to: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1 and click where it says: "Agree and access repository"
+
+The you need to create a token in: https://huggingface.co/settings/tokens and past it after running the following command when it prompts you:
 
 ```
-$ python manage.py fine_tune "/absolute/path/to/dataset/for/fine/tunning"
-```
-
-7. Run migrations
-
-```
-$ python manage.py migrate
+$ huggingface-cli login
 ```
 
 7. Create Django Superuser
 
 ```
-$
+$ python manage.py createsuperuser
 ```
 
-7. Run Django server
+You just need to follow the instructions in the shell to assigne a Username and a Password to your user.
+
+8. Run Django server
 
 ```
 $ python manage.py runserver
@@ -74,12 +74,6 @@ There are two options available to test the solution.
 ```
 $ cd NTD_challenge_OCR
 $ python manage.py process_dataset "/absolute/path/to/dataset"
-```
-
-You can query the ChromaDB directly to get the relevant entities and document types for each one of the processed documents using the following command:
-
-```
-$
 ```
 
 2. The second option will allow you to test the solution on one single document at the time:
@@ -103,24 +97,52 @@ USE mermaid for the diagrma
 
 #### a. Frontend / CLI
 
-Brief description...
+Command line interface that makes use of Django commands to pass the whole dataset through the pipeline.
 
 #### b. Backend API
 
-Technology used, main routes...
+Django.
+
+Main route: **process_document/**
 
 #### c. Document Processing Pipeline
 
-OCR, NLP, etc...
+- OCR (Tesseract)
+- Document classification (mistralai/Mistral-7B-Instruct-v0.1)
+- Document entities extraction (mistralai/Mistral-7B-Instruct-v0.1)
+- Entities, document type and text storage (ChromaDB)
 
 #### d. Storage Layer
 
-Local, cloud, DB...
+Local instance of ChromaDB.
 
 ### 3. Data Flow Example
 
-Describe how an invoice is processed from upload to result...
+1. A request to the endpoint **process_document/** is made with a file attached to it.
+
+2. Text is extracted from the file using the OCR technology.
+
+3. Extracted text then is passed through a LLM (Mistral-7B) for zero-shor-classification.
+
+4. After classification relevant entities are extracted from text depending on its type.
+
+5. Then entities, types and text are stored in ChromaDB.
+
+6. The same stored data is structured as JSON and returned to the client.
 
 ### 4. Design Choices and Justifications
 
-Explain everything that was open to be choosen on the components part (OCR, LLM, explain the adapter pattern, SQLite)
+- Zero-shot-classification: This classification method was selected because is the less expensive method computationally speaking. Other methods that were also considere but did not give great results in comparison with the zero-shot-classification method:
+
+  - Model fine-tunning: After passing the whole dataset through the pipeline the whole traning process took more than 12 hours to complete, making it unfeasible for the given task.
+  - Prompting: Creating a custom prompt to pass to the LLM with some short descriptions of the different document types did not archive great results when comparing with the zero-shot-classification method.
+
+- LLM Model (Minstral-7B): Mistral was selected as the model to be used for classification an entities extraction over other models because of the following:
+
+  - Low cost.
+  - Ability for prompting.
+  - Amount of tokens that can handle.
+
+- OCR Technology (Tesseract): This OCR techonology was selected over others because of the following:
+  - Low cost.
+  - Ease of configuration.
